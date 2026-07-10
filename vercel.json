@@ -1,5 +1,9 @@
 {
+  "buildCommand": "pip install -r requirements.txt",
   "rewrites": [
-    { "source": "/get.php", "destination": "/api/get" }
+    { "source": "/get.php", "destination": "/api/get" },
+    { "source": "/admin", "destination": "/public/admin.html" },
+    { "source": "/", "destination": "/public/admin.html" }
   ]
 }
+
