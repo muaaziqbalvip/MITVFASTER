@@ -88,13 +88,25 @@ def log_session(username: str, ip: str, device_id: str, note: str):
     })
 
 
-def build_m3u(items: list, warning: bool = False) -> str:
+BUY_PRO_VIDEO_URL = os.environ.get("BUY_PRO_VIDEO_URL", "https://your-server.com/buy-pro-promo.mp4")
+
+
+def build_m3u(items: list, warning: bool = False, user_tier: str = "pro") -> str:
     lines = ["#EXTM3U"]
     for item in items:
         name = item.get("name", "Unknown")
         logo = item.get("logo_url") or item.get("poster_url", "")
         category = item.get("category", "General")
-        url = EXPIRED_VIDEO_URL if warning else item.get("stream_url", "")
+        item_tier = item.get("tier", "free")
+
+        if warning:
+            url = EXPIRED_VIDEO_URL
+        elif user_tier == "free" and item_tier == "pro":
+            url = BUY_PRO_VIDEO_URL
+            name = f"LOCKED {name} (PRO - Buy to unlock)"
+        else:
+            url = item.get("stream_url", "")
+
         lines.append(f'#EXTINF:-1 tvg-logo="{logo}" group-title="{category}",{name}')
         lines.append(url)
     return "\n".join(lines)
@@ -146,6 +158,7 @@ def get_playlist(
     movies = [m.to_dict() for m in db.collection("movies").where("active", "==", True).stream()]
 
     all_items = channels + movies
+    user_tier = (user or {}).get("tier", "free")
 
     if status == "expired":
         log_session(username, ip, device_id, "BLOCKED_EXPIRED")
@@ -160,7 +173,7 @@ def get_playlist(
         return Response(content=playlist, media_type="application/vnd.apple.mpegurl")
 
     log_session(username, ip, device_id, "PLAYLIST_SERVED")
-    playlist = build_m3u(all_items)
+    playlist = build_m3u(all_items, user_tier=user_tier)
     return Response(
         content=playlist,
         media_type="application/vnd.apple.mpegurl",

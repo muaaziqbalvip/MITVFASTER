@@ -2,32 +2,25 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users: never allow client-side reads/writes.
-    // All access goes through your server (get.py), which uses the
-    // Admin SDK and bypasses these rules entirely.
+    // Users, channels, sessions: only accessible to YOUR signed-in admin
+    // account (via Firebase Auth email/password), used by admin.html.
+    // Your backend (get.py) uses the Admin SDK and always bypasses these
+    // rules regardless of what's written here.
     match /users/{userId} {
-      allow read, write: if false;
+      allow read, write: if request.auth != null;
     }
-
-    // Channels, movies, series: readable by your admin panel UI only
-    // if that admin UI checks auth (recommended: add your own admin
-    // Firebase Auth check here). Locked down by default.
     match /channels/{channelId} {
-      allow read: if false;
-      allow write: if false;
+      allow read, write: if request.auth != null;
     }
     match /movies/{movieId} {
-      allow read: if false;
-      allow write: if false;
+      allow read, write: if request.auth != null;
     }
     match /series/{seriesId} {
-      allow read: if false;
-      allow write: if false;
+      allow read, write: if request.auth != null;
     }
-
-    // Sessions: server-only (Admin SDK bypasses rules)
     match /sessions/{sessionId} {
-      allow read, write: if false;
+      allow read: if request.auth != null;
+      allow write: if false; // sessions are only written by the server (Admin SDK)
     }
   }
 }
