@@ -1,6 +1,26 @@
 {
-  "rewrites": [
-    { "source": "/get.php", "destination": "/api/get" },
-    { "source": "/admin.html", "destination": "/public/admin.html" }
+  "builds": [
+    {
+      "src": "api/get.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/get.py"
+    },
+    {
+      "src": "/get.php",
+      "dest": "/api/get.py"
+    },
+    {
+      "src": "/admin.html",
+      "dest": "/public/admin.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/get.py"
+    }
   ]
 }
