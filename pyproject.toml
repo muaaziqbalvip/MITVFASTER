@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "mitv-panel"
 version = "1.0.0"
@@ -8,4 +12,4 @@ dependencies = [
 ]
 
 [tool.vercel]
-entrypoint = "api.get:app"
+entrypoint = "api/get.py"
