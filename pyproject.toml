@@ -1,2 +1,11 @@
+[project]
+name = "mitv-panel"
+version = "1.0.0"
+dependencies = [
+    "fastapi",
+    "firebase-admin",
+    "bcrypt",
+]
+
 [tool.vercel]
 entrypoint = "api.get:app"
